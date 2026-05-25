@@ -164,7 +164,7 @@ export function AppSidebar() {
                         autoFocus
                         value={editingValue}
                         onChange={(e) => setEditingValue(e.target.value)}
-                        onClick={(e) => e.stopPropagation()} // Supaya tidak ke-trigger fungsi pindah workspace saat klik input
+                        onClick={(e) => e.stopPropagation()} 
                         onKeyDown={(e) => {
                           if (e.key === "Enter") saveWorkspaceName(index);
                           if (e.key === "Escape") setEditingIndex(null);
@@ -186,11 +186,10 @@ export function AppSidebar() {
                     )}
                   </div>
 
-                  {/* Tombol kecil Edit yang muncul saat hover list item (opsional untuk mempermudah UX) */}
                   {editingIndex !== index && (
                     <button
                       onClick={(e) => {
-                        e.stopPropagation(); // Cegah pindah page
+                        e.stopPropagation(); 
                         startEditing(index, workspace.name);
                       }}
                       className="opacity-0 group-hover:opacity-100 p-1 hover:bg-stone-200/60 dark:hover:bg-stone-800 rounded transition-opacity ml-2 shrink-0"
