@@ -25,7 +25,6 @@ export default function TaskDetailPage() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Inisialisasi state secara langsung untuk render pertama (Bebas ESLint Error)
   const [task, setTask] = useState<Task | null>(() => {
     if (typeof window === "undefined" || !taskId) return null;
 
@@ -39,13 +38,13 @@ export default function TaskDetailPage() {
 
   useEffect(() => {
     if (!taskId) {
-      const timer = setTimeout(() => {
+      const fetchDetailTask = setTimeout(() => {
         setIsLoading(false);
       }, 0);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(fetchDetailTask);
     }
 
-    const timer = setTimeout(() => {
+    const fetchDetailTask = setTimeout(() => {
       const storedTasks = localStorage.getItem("tasks");
       if (storedTasks) {
         const parsedTasks = JSON.parse(storedTasks);
@@ -54,7 +53,7 @@ export default function TaskDetailPage() {
       }
       setIsLoading(false);
     }, 350);
-    return () => clearTimeout(timer);
+    return () => clearTimeout(fetchDetailTask);
   }, [taskId]);
 
   const handleToggleCompleted = () => {
@@ -169,7 +168,7 @@ export default function TaskDetailPage() {
             <div className="flex items-center gap-2 text-xs font-bold text-stone-900 uppercase tracking-wide">
               <span>Description & Objectives</span>
             </div>
-            <div className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 bg-stone-50/40 whitespace-pre-wrap min-h-[60px]">
+            <div className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 bg-stone-50/40 whitespace-pre-wrap min-h-15">
               {task.desc || "No description provided."}
             </div>
           </div>

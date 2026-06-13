@@ -48,21 +48,24 @@ type Task = {
   priorityAccent: string;
   dueDate: Date;
   createdAt: Date;
-  workspaceId: string;
+  isPinned?: boolean;
 };
 
 type TaskFormDialogProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  workspaceId: string;
   taskPayload: Task | null;
   onSave: (task: Task, isEditMode: boolean) => void;
+};
+
+type FormErrors = {
+  title?: string;
+  date?: string;
 };
 
 export function AddTaskDialog({
   isOpen,
   onOpenChange,
-  workspaceId,
   taskPayload,
   onSave,
 }: TaskFormDialogProps) {
@@ -74,8 +77,9 @@ export function AddTaskDialog({
   const [date, setDate] = useState<Date | undefined>(
     taskPayload ? new Date(taskPayload.dueDate) : undefined,
   );
+
+  const [errors, setErrors] = useState<FormErrors>({});
   const isEditMode = !!taskPayload;
-  const isFormInvalid = !title.trim() || !date || !workspaceId;
   const handleOpenChange = (open: boolean) => {
     onOpenChange(open);
 
@@ -88,13 +92,25 @@ export function AddTaskDialog({
   };
 
   const handleSubmit = () => {
-    if (isFormInvalid) return;
+    const newErrors: FormErrors = {};
+
+    if (!title.trim()) {
+      newErrors.title = "Task title is required.";
+    }
+    if (!date) {
+      newErrors.date = "Please select a due date.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     const dataToSave: Task = {
       id: taskPayload ? taskPayload.id : crypto.randomUUID(),
       title,
       desc,
       status: taskPayload ? taskPayload.status : "pending",
-      workspaceId,
       priorityAccent: priorityAccent || "medium",
       dueDate: date || new Date(),
       createdAt: taskPayload ? taskPayload.createdAt : new Date(),
@@ -112,7 +128,7 @@ export function AddTaskDialog({
           <DialogDescription>
             {isEditMode
               ? "Make changes to your task details below."
-              : "Create a new task for your workspace."}
+              : "Create a new task."}
           </DialogDescription>
         </DialogHeader>
 
@@ -125,8 +141,22 @@ export function AddTaskDialog({
             <Input
               placeholder="Title of the task..."
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (errors.title)
+                  setErrors((prev) => ({ ...prev, title: undefined }));
+              }}
+              className={
+                errors.title
+                  ? "border-red-500 focus-visible:ring-red-500 bg-red-50/20"
+                  : ""
+              }
             />
+            {errors.title && (
+              <span className="text-xs font-semibold text-red-500 mt-0.5 transition-all">
+                {errors.title}
+              </span>
+            )}
           </div>
           <div className="flex flex-col gap-2">
             <Label>Description</Label>
@@ -165,13 +195,17 @@ export function AddTaskDialog({
             <Label className="flex items-center gap-0.5">
               <span>Due Date</span>
               <span className="text-red-500 font-bold">*</span>
-            </Label>{" "}
+            </Label>
             <Popover>
               <PopoverTrigger
                 render={
                   <Button
                     variant="outline"
-                    className="justify-start font-normal w-full"
+                    className={`justify-start font-normal w-full ${
+                      errors.date
+                        ? "border-red-500 text-red-900 bg-red-50/20"
+                        : ""
+                    }`}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {date ? format(date, "PPP") : <span>Pick a date</span>}
@@ -179,14 +213,28 @@ export function AddTaskDialog({
                 }
               />
               <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={date} onSelect={setDate} />
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(selectedDate) => {
+                    setDate(selectedDate);
+                    // Dynamically clear data errors on calendar picker click
+                    if (errors.date)
+                      setErrors((prev) => ({ ...prev, date: undefined }));
+                  }}
+                />
               </PopoverContent>
             </Popover>
+            {errors.date && (
+              <span className="text-xs font-semibold text-red-500 mt-0.5 transition-all">
+                {errors.date}
+              </span>
+            )}
           </div>
         </div>
 
         <DialogFooter className="mt-2">
-          <Button onClick={handleSubmit} disabled={isFormInvalid}>
+          <Button onClick={handleSubmit}>
             {isEditMode ? "Save Changes" : "Create Task"}
           </Button>
         </DialogFooter>
