@@ -1,23 +1,19 @@
-import nextJest from "next/jest.js"; // Explicitly add .js extension
+import nextJest from "next/jest.js";
+import type { Config } from "jest";
 
 const createJestConfig = nextJest({
   dir: "./",
 });
 
-/** @type {import('jest').Config} */
-const config = {
+const config: Config = {
   clearMocks: true,
-
   collectCoverage: true,
-
   coverageDirectory: "coverage",
-
   coverageProvider: "v8",
 
-  testEnvironment: "jest-environment-jsdom", // Explicitly use the full package name
+  testEnvironment: "jest-environment-jsdom",
 
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
-
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },

@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { AddTaskDialog } from "@/app/components/AddTaskDialog";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar } from "@/components/ui/calendar";
@@ -61,7 +60,6 @@ const cardStats = [
 ];
 
 export default function WorkspacePage() {
-  const params = useParams();
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   const [tasks, setTasks] = useState<Task[]>([]);
